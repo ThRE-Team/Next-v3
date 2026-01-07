@@ -21,7 +21,7 @@ initialize_variables() {
 
 setup_kernelsu() {
     echo "[+] Setting up KernelSU-Next..."
-    test -d "$KERNEL_DIR/KernelSU-Next" || git clone "https://github.com/$OWNER/$REPO -b $BRANC KernelSU-Next --depth=1" && echo "[+] Repository cloned."
+    test -d "$KERNEL_DIR/KernelSU-Next" || git clone "https://github.com/$OWNER/$REPO" -b $BRANC KernelSU-Next --depth=1 && echo "[+] Repository cloned."
     cd "$KERNEL_DIR/KernelSU-Next"
     git stash && echo "[-] Stashed current changes."
     git pull && echo "[+] Repository updated."
