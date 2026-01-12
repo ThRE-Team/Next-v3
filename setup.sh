@@ -4,7 +4,7 @@ set -eu
 KERNEL_DIR=$(pwd)
 OWNER="ThRE-Team"
 REPO="Next-v3"
-BRANC="main"
+BRANC="32953"
 
 initialize_variables() {
     if test -d "$KERNEL_DIR/common/drivers"; then
