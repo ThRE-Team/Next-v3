@@ -32,11 +32,7 @@ static apk_sign_key_t apk_sign_keys[] = {
 	{ EXPECTED_SIZE_OFFICIAL, EXPECTED_HASH_OFFICIAL }, // Official
 	{ EXPECTED_SIZE_RSUNTK, EXPECTED_HASH_RSUNTK }, // RKSU
 	{ EXPECTED_SIZE_5EC1CFF, EXPECTED_HASH_5EC1CFF }, // MKSU
-	{ EXPECTED_SIZE_KOWX712, EXPECTED_HASH_KOWX712 }, // KowSU
-	
-#ifdef EXPECTED_SIZE
-	{ EXPECTED_SIZE, EXPECTED_HASH }, // Custom
-#endif
+	{ EXPECTED_SIZE_KOWX712, EXPECTED_HASH_KOWX712 } // KowSU
 };
 
 static struct sdesc *init_sdesc(struct crypto_shash *alg)
@@ -86,14 +82,11 @@ static int ksu_sha256(const unsigned char *data, unsigned int datalen,
 	return ret;
 }
 
-//static bool check_block(struct file *fp, u32 *size4, loff_t *pos, u32 *offset,
-//			unsigned expected_size, const char *expected_sha256)
-			
 static bool check_block(struct file *fp, u32 *size4, loff_t *pos, u32 *offset)
+			//unsigned expected_size, const char *expected_sha256)
 {
 	int i;
 	apk_sign_key_t sign_key;
-	
 	ksu_kernel_read_compat(fp, size4, 0x4, pos); // signer-sequence length
 	ksu_kernel_read_compat(fp, size4, 0x4, pos); // signer length
 	ksu_kernel_read_compat(fp, size4, 0x4, pos); // signed data length
@@ -109,16 +102,13 @@ static bool check_block(struct file *fp, u32 *size4, loff_t *pos, u32 *offset)
 	ksu_kernel_read_compat(fp, size4, 0x4, pos); // certificate length
 	*offset += 0x4 * 2;
 
-//	if (*size4 == expected_size) {
-//		*offset += *size4;
-		
-		for (i = 0; i < ARRAY_SIZE(apk_sign_keys); i++) {
+	for (i = 0; i < ARRAY_SIZE(apk_sign_keys); i++) {
 		sign_key = apk_sign_keys[i];
 
 		if (*size4 != sign_key.size)
 			continue;
 		*offset += *size4;
-		
+
 #define CERT_MAX_LENGTH 1024
 		char cert[CERT_MAX_LENGTH];
 		if (*size4 > CERT_MAX_LENGTH) {
@@ -198,10 +188,9 @@ static bool has_v1_signature_file(struct file *fp)
 	return false;
 }
 
-//static __always_inline bool check_v2_signature(char *path,
-	//					unsigned expected_size,
-//						const char *expected_sha256)
 static __always_inline bool check_v2_signature(char *path)
+					//	unsigned expected_size,
+					//	const char *expected_sha256)
 {
 	unsigned char buffer[0x11] = { 0 };
 	u32 size4;
@@ -274,6 +263,7 @@ static __always_inline bool check_v2_signature(char *path)
 			v2_signing_blocks++;
 			v2_signing_valid =
 				check_block(fp, &size4, &pos, &offset);
+				//		expected_size, expected_sha256);
 		} else if (id == 0xf05368c0u) {
 			// http://aospxref.com/android-14.0.0_r2/xref/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV3Verifier.java#73
 			v3_signing_exist = true;
